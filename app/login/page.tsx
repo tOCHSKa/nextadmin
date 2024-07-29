@@ -1,8 +1,16 @@
 import React from 'react'
+import styles from '@/ui/login/login.module.css';
 
-function LoginPage() {
+const LoginPage = () => {
   return (
-    <div>LoginPage</div>
+    <div className={styles.container}>
+      <form action="">
+        <h1>Login</h1>
+      <input type="text" placeholder='username'/>
+      <input type="password" placeholder='password'/>
+      <button>Login</button>
+      </form>
+    </div>
   )
 }
 
