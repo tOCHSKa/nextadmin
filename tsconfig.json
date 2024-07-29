@@ -17,10 +17,11 @@
         "name": "next"
       }
     ],
+    "baseUrl": ".", // Assurez-vous que la base est le répertoire racine du projet
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./app/*"] // Changez src en app
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/types/**/*.d.ts"],
   "exclude": ["node_modules"]
 }
