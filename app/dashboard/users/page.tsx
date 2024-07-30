@@ -5,12 +5,22 @@ import styles from '@/ui/dashboard/users/users.module.css'
 import Link from 'next/link';
 import Image from 'next/image';
 import { fetchUsers } from '@/lib/data';
+import { deleteUser } from '@/lib/actions';
 
+// Définir les types pour les paramètres de recherche
+interface UserpageProps {
+  searchParams: {
+    q?: string;
+    page? :number;
+  };
+}
 
-const Userpage: React.FC = async () => {
+const Userpage: React.FC<UserpageProps> = async ({ searchParams })  => {
 
-  const users = await fetchUsers();
-  console.log(users)
+  const q = searchParams?.q || "";
+  const page = searchParams?.page || 1;
+  const {count, users} = await fetchUsers(q, page);
+
   return (
     <div className={styles.container}>
       <div className={styles.top}>
@@ -46,22 +56,25 @@ const Userpage: React.FC = async () => {
                 </div>
               </td>
               <td>{user.email}</td>
-              <td>13.01.2022</td>
+              <td>{user.createdAt?.toString().slice(4,16)}</td>
               <td>{user.isAdmin ? 'Admin' : 'User'}</td>
               <td>{user.isActive ? 'Active' : 'Inactive'}</td>
               <td>
-                <div className={styles.buttons}>
+              <div className={styles.buttons}>
                   <Link href={`/dashboard/users/${user.id}`}>
                     <button className={`${styles.button} ${styles.view}`}>View</button>
                   </Link>
-                  <button className={`${styles.button} ${styles.delete}`}>Delete</button>
+                  <form action={deleteUser}>
+                    <input type="hidden" name="id" value={user.id} />
+                    <button className={`${styles.button} ${styles.delete}`}>Delete</button>
+                  </form>
                 </div>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      <Pagination />
+      <Pagination count={count} />
     </div>
   );
 };

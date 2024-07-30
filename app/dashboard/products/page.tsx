@@ -3,8 +3,22 @@ import Link from "next/link";
 import styles from "@/ui/dashboard/products/products.module.css";
 import Search from "@/ui/dashboard/search/search";
 import Pagination from "@/ui/dashboard/pagination/pagination";
+import { fetchProduct, fetchProducts } from "@/lib/data";
+import { deleteProduct } from "@/lib/actions";
 
-const ProductsPage = () => {
+
+// Définir les types pour les paramètres de recherche
+interface ProductpageProps {
+  searchParams: {
+    q?: string;
+    page? :number;
+  };
+}
+
+const ProductsPage: React.FC<ProductpageProps> = async ({ searchParams }) => {
+  const q = searchParams?.q || "";
+  const page = searchParams?.page || 1;
+  const {count, products } = await fetchProducts(q, page);
 
   return (
     <div className={styles.container}>
@@ -26,31 +40,33 @@ const ProductsPage = () => {
           </tr>
         </thead>
         <tbody>
-            <tr key={""}>
+          {products.map(product =>(
+            <tr key={product.id}>
               <td>
                 <div className={styles.product}>
                   <Image
-                    src="/noproduct.jpg"
+                    src={product.img || "/noproduct.jpg"}
                     alt=""
                     width={40}
                     height={40}
                     className={styles.productImage}
                   />
+                  {product.title}
                 </div>
               </td>
-              <td>test</td>
-              <td>test</td>
-              <td>test</td>
-              <td>test</td>
+              <td>{product.desc}</td>
+              <td>{product.price}</td>
+              <td>{product.createdAt?.toString().slice(4,16)}</td>
+              <td>{product.stock}</td>
               <td>
                 <div className={styles.buttons}>
-                  <Link href={`/dashboard/products/test`}>
+                  <Link href={`/dashboard/products/${product.id}`}>
                     <button className={`${styles.button} ${styles.view}`}>
                       View
                     </button>
                   </Link>
-                  <form action={""}>
-                    <input type="hidden" name="id" value={""} />
+                  <form action={deleteProduct}>
+                    <input type="hidden" name="id" value={product.id} />
                     <button className={`${styles.button} ${styles.delete}`}>
                       Delete
                     </button>
@@ -58,9 +74,10 @@ const ProductsPage = () => {
                 </div>
               </td>
             </tr>
+            ))}
         </tbody>
       </table>
-      <Pagination />
+      <Pagination count={count}/>
     </div>
   );
 };
