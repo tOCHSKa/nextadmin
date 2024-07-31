@@ -165,7 +165,10 @@ export const deleteUser = async (FormData: FormData) => {
     redirect("/dashboard/users");
 };
 
-export const authenticate = async (formData: FormData): Promise<void> => {
+interface formDataProps {
+
+} 
+const authenticate = async (formData:any) => {
     try {
         // Convertir FormData en objet
         const data = Object.fromEntries(formData.entries()) as { username: string, password: string };
@@ -183,3 +186,5 @@ export const authenticate = async (formData: FormData): Promise<void> => {
         throw new Error("Failed to login");
     }
 };
+
+export default authenticate

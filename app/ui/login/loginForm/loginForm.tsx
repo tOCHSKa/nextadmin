@@ -1,6 +1,6 @@
 "use client";
 
-import { authenticate } from "@/lib/actions";
+import  authenticate  from "@/lib/actions";
 import styles from "./loginForm.module.css";
 import { useFormState } from "react-dom";
 
@@ -14,6 +14,7 @@ const LoginForm = () => {
             <input type="text" placeholder="username" name="username" />
             <input type="password" placeholder="password" name="password" />
             <button>Login</button>
+            {state && state}
         </form>
     );
 };
