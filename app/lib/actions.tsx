@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { Product, User } from "./models";
 import { connectToDB } from "./utils";
-import  bcrypt  from "bcrypt"
+import bcrypt from "bcrypt"
+import { signIn } from "next-auth/react";
 
 interface AddUserProps {
     id: string;
@@ -18,7 +19,7 @@ interface AddUserProps {
 
 }
 
-const addUser = async (formData: FormData) => {
+export const addUser = async (formData: FormData) => {
 
     try {
         // Convert formData to an object
@@ -48,11 +49,11 @@ const addUser = async (formData: FormData) => {
         console.error(err);
         throw new Error("Failed to create user!");
     }
-            // Revalidate the users path
-            revalidatePath("/dashboard/users");
+    // Revalidate the users path
+    revalidatePath("/dashboard/users");
 
-            // Redirect to the users dashboard
-            redirect("/dashboard/users");
+    // Redirect to the users dashboard
+    redirect("/dashboard/users");
 };
 
 export const updateUser = async (formData: FormData) => {
@@ -69,20 +70,20 @@ export const updateUser = async (formData: FormData) => {
 
         // Iterate over the keys and delete fields with empty or undefined values
         (Object.keys(updateFields) as (keyof AddUserProps)[]).forEach((key) => {
-        if (updateFields[key] === "" || updateFields[key] === undefined) {
-            delete updateFields[key];
-        }
+            if (updateFields[key] === "" || updateFields[key] === undefined) {
+                delete updateFields[key];
+            }
 
-    });
+        });
 
-    await User.findByIdAndUpdate(userData.id , updateFields)
+        await User.findByIdAndUpdate(userData.id, updateFields)
 
     } catch (err) {
         console.error(err);
         throw new Error("Failed to create user!");
     }
-            revalidatePath("/dashboard/users");
-            redirect("/dashboard/users");
+    revalidatePath("/dashboard/users");
+    redirect("/dashboard/users");
 };
 
 
@@ -123,43 +124,62 @@ export const addProduct = async (formData: FormData) => {
         console.error(err);
         throw new Error("Failed to create product!");
     }
-            // Revalidate the users path
-            revalidatePath("/dashboard/products");
+    // Revalidate the users path
+    revalidatePath("/dashboard/products");
 
-            // Redirect to the users dashboard
-            redirect("/dashboard/products");
+    // Redirect to the users dashboard
+    redirect("/dashboard/products");
 };
 
-export const deleteProduct = async (FormData: FormData) => { 
+export const deleteProduct = async (FormData: FormData) => {
     const { id } = Object.fromEntries(FormData);
 
-    try { 
+    try {
         connectToDB()
         await Product.findByIdAndDelete(id)
-    } catch(err) {
+    } catch (err) {
         console.log(err);
         throw new Error("Failed to delete product! ")
     }
-                // Revalidate the users path
-                revalidatePath("/dashboard/products");
+    // Revalidate the users path
+    revalidatePath("/dashboard/products");
 
-                // Redirect to the users dashboard
-                redirect("/dashboard/products");
+    // Redirect to the users dashboard
+    redirect("/dashboard/products");
 };
 
-export const deleteUser = async (FormData: FormData) => { 
+export const deleteUser = async (FormData: FormData) => {
     const { id } = Object.fromEntries(FormData);
 
-    try { 
+    try {
         connectToDB()
         await User.findByIdAndDelete(id)
-    } catch(err) {
+    } catch (err) {
         console.log(err);
         throw new Error("Failed to delete user! ")
     }
-                // Revalidate the users path
-                revalidatePath("/dashboard/users");
+    // Revalidate the users path
+    revalidatePath("/dashboard/users");
 
-                // Redirect to the users dashboard
-                redirect("/dashboard/users");
+    // Redirect to the users dashboard
+    redirect("/dashboard/users");
+};
+
+export const authenticate = async (formData: FormData): Promise<void> => {
+    try {
+        // Convertir FormData en objet
+        const data = Object.fromEntries(formData.entries()) as { username: string, password: string };
+
+        await connectToDB();
+        const user = await User.findOne({ username: data.username });
+        if (!user) throw new Error("Wrong credentials");
+
+        const isPasswordCorrect = await bcrypt.compare(data.password, user.password);
+        if (!isPasswordCorrect) throw new Error("Wrong credentials");
+
+        return user;
+    } catch (err) {
+        console.error(err);
+        throw new Error("Failed to login");
+    }
 };
