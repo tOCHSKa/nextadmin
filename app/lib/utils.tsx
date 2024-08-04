@@ -1,22 +1,22 @@
 import mongoose, { Connection } from "mongoose"
 
 interface ConnectionType {
-    isConnected?: number;
-  }
+  isConnected?: number;
+}
 
 
 const handleError = (error: any) => {
-    console.error('Failed to connect to MongoDB:', error);
-  };
+  console.error('Failed to connect to MongoDB:', error);
+};
 
-  const connection: ConnectionType = {};
+const connection: ConnectionType = {};
 
 export const connectToDB = async () => {
 
-    if (connection.isConnected) {
-        console.log('Already connected to MongoDB');
-        return;
-      }
+  if (connection.isConnected) {
+    console.log('Already connected to MongoDB');
+    return;
+  }
 
   try {
     const db = await mongoose.connect(process.env.MONGO as string, {
